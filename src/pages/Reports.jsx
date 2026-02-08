@@ -195,6 +195,71 @@ const generateInventoryReport = () => {
   );
 };
 
+const exportBackup = () => {
+  const data = {
+    movements: localStorage.getItem("agro-stock-movements"),
+    purchases: localStorage.getItem("agro-stock-purchases"),
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "text/plain;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `agrostock-backup-${new Date()
+    .toISOString()
+    .slice(0, 10)}.txt`;
+
+  link.click();
+};
+const importBackup = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    try {
+      const content = JSON.parse(e.target.result);
+
+      if (
+        !content.movements ||
+        !content.purchases
+      ) {
+        alert("Archivo inválido");
+        return;
+      }
+
+      const confirmRestore = window.confirm(
+        "⚠ Esto reemplazará todos los datos actuales. ¿Continuar?"
+      );
+
+      if (!confirmRestore) return;
+
+      localStorage.setItem(
+        "agro-stock-movements",
+        content.movements
+      );
+
+      localStorage.setItem(
+        "agro-stock-purchases",
+        content.purchases
+      );
+
+      alert("Backup restaurado correctamente ✅");
+      window.location.reload();
+    } catch (error) {
+      alert("Error al restaurar el backup");
+    }
+  };
+
+  reader.readAsText(file);
+};
+
   return (
     <div className="max-w-4xl bg-white p-8 rounded-2xl shadow-sm">
       <h1 className="text-2xl font-semibold mb-6">
@@ -272,11 +337,37 @@ const generateInventoryReport = () => {
           Descargar Reporte Ventas
         </button>
         <button
-  onClick={generateInventoryReport}
-  className="bg-black text-white px-6 py-3 rounded-xl"
->
-  Descargar Inventario Actual
-</button>
+          onClick={generateInventoryReport}
+          className="bg-black text-white px-6 py-3 rounded-xl"
+        >
+          Descargar Inventario Actual
+        </button>
+        <button
+          type="button"
+          onClick={exportBackup}
+          className="bg-gray-900 text-white px-4 py-2 rounded-lg"
+        >
+          Descargar Backup
+        </button>
+        <div className="flex gap-4 mt-4">
+  <button
+    type="button"
+    onClick={exportBackup}
+    className="bg-gray-900 text-white px-4 py-2 rounded-lg"
+  >
+    Descargar Backup
+  </button>
+
+  <label className="bg-gray-200 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-300 transition">
+    Restaurar Backup
+    <input
+      type="file"
+      accept=".txt"
+      onChange={importBackup}
+      className="hidden"
+    />
+  </label>
+</div>
 
       </div>
     </div>
