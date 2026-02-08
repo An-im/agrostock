@@ -342,32 +342,27 @@ const importBackup = (event) => {
         >
           Descargar Inventario Actual
         </button>
-        <button
-          type="button"
-          onClick={exportBackup}
-          className="bg-gray-900 text-white px-4 py-2 rounded-lg"
-        >
-          Descargar Backup
-        </button>
-        <div className="flex gap-4 mt-4">
-  <button
-    type="button"
-    onClick={exportBackup}
-    className="bg-gray-900 text-white px-4 py-2 rounded-lg"
-  >
-    Descargar Backup
-  </button>
 
-  <label className="bg-gray-200 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-300 transition">
-    Restaurar Backup
-    <input
-      type="file"
-      accept=".txt"
-      onChange={importBackup}
-      className="hidden"
-    />
-  </label>
-</div>
+    
+        <div className="flex gap-4 mt-4">
+          <button
+            type="button"
+            onClick={exportBackup}
+            className="bg-gray-900 text-white px-4 py-2 rounded-lg"
+          >
+            Descargar Backup
+          </button      >
+                
+          <label className="bg-gray-200 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-300 transition">
+            Restaurar Backup
+            <input
+              type="file"
+              accept=".txt"
+              onChange={importBackup}
+              className="hidden"
+            />
+          </label>
+        </div>
 
       </div>
     </div>
