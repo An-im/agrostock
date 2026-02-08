@@ -21,7 +21,7 @@ export default function Purchases() {
         productId: "",
         search: "",
         quantity: 1,
-        unitCost: 0,
+        unitCost: "",
       },
     ]);
   };
