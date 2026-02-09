@@ -23,38 +23,44 @@ export default function Reports() {
     ? Number("20" + shortYear)
     : null;
 
-
-  // 🔹 Filtrar compras del mes
-  const monthlyPurchases = purchases.filter((p) => {
-    const d = new Date(p.date);
-    return (
-      d.getFullYear() === Number(year) &&
-      d.getMonth() + 1 === Number(month)
-    );
-  });
-
-  // 🔹 Filtrar ventas del mes
-  const monthlySales = movements.filter((m) => {
-    const d = new Date(m.date);
-    return (
-      m.type === "out" &&
-      m.status === "active" &&
-      d.getFullYear() === Number(year) &&
-      d.getMonth() + 1 === Number(month)
-    );
-  });
-
-  const totalPurchases = monthlyPurchases.reduce(
-    (sum, p) => sum + p.total,
-    0
+// 🔹 Filtrar compras del mes (solo activas)
+const monthlyPurchases = purchases.filter((p) => {
+  const d = new Date(p.date);
+  return (
+    p.status !== "cancelled" &&
+    d.getFullYear() === Number(year) &&
+    d.getMonth() + 1 === Number(month)
   );
+});
 
-  const totalSales = monthlySales.reduce(
-    (sum, m) => sum + (m.total || 0),
-    0
+// 🔹 Filtrar ventas del mes (solo activas)
+
+const monthlySales = movements.filter((m) => {
+  const d = new Date(m.date);
+  return (
+    m.type === "out" &&
+    (m.status ?? "active") !== "cancelled" &&
+    d.getFullYear() === Number(year) &&
+    d.getMonth() + 1 === Number(month)
   );
+});
 
-  const balance = totalSales - totalPurchases;
+
+
+// 🔹 Totales
+const totalPurchases = monthlyPurchases.reduce(
+  (sum, p) => sum + p.total,
+  0
+);
+
+const totalSales = monthlySales.reduce(
+  (sum, m) => sum + (m.total || 0),
+  0
+);
+
+const balance = totalSales - totalPurchases;
+
+ 
 
   // ===========================
   // 📄 PDF COMPRAS

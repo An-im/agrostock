@@ -61,6 +61,7 @@ export default function Purchases() {
         unitCost: Number(item.unitCost),
       })),
       total,
+      status: "active", 
     };
 
     addPurchase(purchase);

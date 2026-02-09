@@ -17,9 +17,11 @@ export default function Prices() {
 
   // 🔎 Generamos historial plano
   const priceRows = useMemo(() => {
-    let rows = [];
+  let rows = [];
 
-    purchases.forEach((purchase) => {
+  purchases
+    .filter(p => p.status !== "cancelled") // 👈 IMPORTANTE
+    .forEach((purchase) => {
       purchase.items.forEach((item) => {
         rows.push({
           productId: item.productId,
@@ -32,11 +34,12 @@ export default function Prices() {
       });
     });
 
-    return rows.sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
+  return rows.sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
 
-  }, [purchases]);
+}, [purchases]);
+
 
   // 🧠 Lista de productos únicos
   const products = useMemo(() => {

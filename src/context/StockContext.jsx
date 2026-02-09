@@ -28,6 +28,11 @@ export const StockProvider = ({ children }) => {
   useEffect(() => {
     savePurchasesToStorage(purchases);
   }, [purchases]);
+  
+  const getProductStock = (productId) => {
+    return calculateStock(movements, productId);
+  };
+
 
   // ✅ ADD MOVEMENT (ventas)
   const addMovement = (movement) => {
@@ -71,29 +76,51 @@ export const StockProvider = ({ children }) => {
   };
 
   // ✅ CANCEL MOVEMENT
-  const cancelMovement = (movementId, reason) => {
-    const movementToCancel = movements.find(
-      (m) => m.id === movementId
-    );
+const cancelMovement = (movementId, reason) => {
+  const movementToCancel = movements.find(
+    (m) => m.id === movementId
+  );
 
-    if (!movementToCancel || movementToCancel.status === "cancelled") {
-      return { success: false };
-    }
+  if (!movementToCancel || movementToCancel.status === "cancelled") {
+    return { success: false };
+  }
 
-    const updatedMovements = movements.map((m) =>
-      m.id === movementId
-        ? { ...m, status: "cancelled", reason }
-        : m
-    );
+  const updatedMovements = movements.map((m) =>
+    m.id === movementId
+      ? { ...m, status: "cancelled", reason }
+      : m
+  );
 
-    setMovements(updatedMovements);
+  setMovements(updatedMovements);
 
-    return { success: true };
-  };
+  return { success: true };
+};
 
-  const getProductStock = (productId) => {
-    return calculateStock(movements, productId);
-  };
+// ✅ CANCEL PURCHASE (DEBE ESTAR FUERA)
+const cancelPurchase = (purchaseId) => {
+
+  // 1️⃣ Marcar compra como cancelada
+  const updatedPurchases = purchases.map((p) =>
+    p.id === purchaseId
+      ? { ...p, status: "cancelled" }
+      : p
+  );
+
+  setPurchases(updatedPurchases);
+
+  // 2️⃣ Cancelar movimientos asociados
+  const updatedMovements = movements.map((m) =>
+    m.source === "purchase" &&
+    m.sourceId === purchaseId
+      ? { ...m, status: "cancelled" }
+      : m
+  );
+
+  setMovements(updatedMovements);
+
+  return { success: true };
+};
+
 
   return (
     <StockContext.Provider
@@ -103,6 +130,7 @@ export const StockProvider = ({ children }) => {
         addMovement,
         addPurchase,
         cancelMovement,
+        cancelPurchase,
         getProductStock,
       }}
     >

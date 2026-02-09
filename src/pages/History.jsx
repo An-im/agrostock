@@ -3,7 +3,8 @@ import { flatCatalog } from "../data/flatCatalog";
 import { useState } from "react";
 
 export default function History() {
-  const { movements, purchases, cancelMovement } = useStock();
+  const { movements, purchases, cancelMovement, cancelPurchase } = useStock();
+
   const [filterType, setFilterType] = useState("all");
   const [selectedId, setSelectedId] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -151,11 +152,18 @@ export default function History() {
           onClick={() => {
             if (!cancelReason.trim()) return;
 
-            cancelMovement(selectedId, cancelReason);
+            const movement = movements.find(m => m.id === selectedId);
 
+            if (movement.source === "purchase") {
+              cancelPurchase(movement.sourceId);
+            } else {
+              cancelMovement(selectedId, cancelReason);
+            }
+          
             setSelectedId(null);
             setCancelReason("");
           }}
+
           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
         >
           Confirmar
