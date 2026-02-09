@@ -37,40 +37,57 @@ export default function Movements() {
 
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!selectedProduct || quantity <= 0 || unitPrice < 0) return;
+  setError("");
+  setSuccessMessage("");
 
-    const movement = {
-      id: uuidv4(),
-      productId: selectedProduct.id,
-      type: "out",
-      quantity: Number(quantity),
-      unitPrice: Number(unitPrice),
-      total: total,
-      date: new Date().toISOString(),
-      status: "active",
-      reason: null,
-      relatedMovementId: null,
-    };
+  // 🔹 Validar producto
+  if (!selectedProduct) {
+    setError("Selecciona un producto");
+    return;
+  }
 
-    const result = addMovement(movement);
+  // 🔹 Validar cantidad
+  if (!quantity || Number(quantity) <= 0) {
+    setError("La cantidad debe ser mayor a 0");
+    return;
+  }
 
+  // 🔹 Validar precio
+  if (!unitPrice || Number(unitPrice) <= 0) {
+    setError("El precio unitario debe ser mayor a 0");
+    return;
+  }
 
-    if (!result.success) {
-      setError(result.message);
-      setSuccessMessage("");
-      return;
-    }
-
-    setError("");
-    setSuccessMessage("Venta registrada correctamente ✔");
-
-    setSelectedProduct(null);
-    setSearch("");
-    setQuantity(1);
-    setUnitPrice("");
+  const movement = {
+    id: uuidv4(),
+    productId: selectedProduct.id,
+    type: "out",
+    quantity: Number(quantity),
+    unitPrice: Number(unitPrice),
+    total: Number(quantity) * Number(unitPrice),
+    date: new Date().toISOString(),
+    status: "active",
+    reason: null,
+    relatedMovementId: null,
   };
+
+  const result = addMovement(movement);
+
+  if (!result.success) {
+    setError(result.message);
+    return;
+  }
+
+  setSuccessMessage("Venta registrada correctamente ✔");
+
+  setSelectedProduct(null);
+  setSearch("");
+  setQuantity(1);
+  setUnitPrice("");
+};
+
 
   return (
     <div className="max-w-3xl">

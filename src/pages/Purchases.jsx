@@ -44,33 +44,67 @@ export default function Purchases() {
   );
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!supplier || items.length === 0) return;
+  // 🔹 Validaciones generales
+  if (!supplier) {
+    alert("Selecciona un proveedor");
+    return;
+  }
 
-    const purchase = {
-      id: crypto.randomUUID(),
-      supplierId: supplier,
-      supplierName:
-        suppliers.find((s) => s.id === supplier)?.name,
-      invoiceNumber,
-      date,
-      items: items.map((item) => ({
-        ...item,
-        quantity: Number(item.quantity),
-        unitCost: Number(item.unitCost),
-      })),
-      total,
-      status: "active", 
-    };
+  if (!invoiceNumber.trim()) {
+    alert("Ingresa el número de factura");
+    return;
+  }
 
-    addPurchase(purchase);
+  if (items.length === 0) {
+    alert("Agrega al menos un producto");
+    return;
+  }
 
-    setSupplier("");
-    setInvoiceNumber("");
-    setItems([]);
-    setSuccess("Compra registrada correctamente ✔");
+  // 🔹 Validar cada item
+  for (let item of items) {
+    if (!item.productId) {
+      alert("Todos los productos deben estar seleccionados");
+      return;
+    }
+
+    if (!item.quantity || Number(item.quantity) <= 0) {
+      alert("La cantidad debe ser mayor a 0");
+      return;
+    }
+
+    if (!item.unitCost || Number(item.unitCost) <= 0) {
+      alert("El costo unitario debe ser mayor a 0");
+      return;
+    }
+  }
+
+  // 🔹 Si todo está OK
+  const purchase = {
+    id: crypto.randomUUID(),
+    supplierId: supplier,
+    supplierName:
+      suppliers.find((s) => s.id === supplier)?.name,
+    invoiceNumber,
+    date,
+    items: items.map((item) => ({
+      ...item,
+      quantity: Number(item.quantity),
+      unitCost: Number(item.unitCost),
+    })),
+    total,
+    status: "active",
   };
+
+  addPurchase(purchase);
+
+  setSupplier("");
+  setInvoiceNumber("");
+  setItems([]);
+  setSuccess("Compra registrada correctamente ✔");
+};
+
 
   return (
     <div className="max-w-4xl">
